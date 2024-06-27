@@ -699,7 +699,7 @@ def main():
             print(value)
 
     elif args.set_parameter:
-        midi_in, midi_out = open_midi_ports(args)
+        midi_in, midi_out = open_midi_ports(args.midi_in, args.midi_out)
         ur44c = UR44C(midi_in, midi_out)
         if args.set_parameter[1]=='min':
             value = getattr(unit, args.set_parameter[0])[1]
