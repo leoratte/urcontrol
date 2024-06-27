@@ -531,13 +531,13 @@ class UR44C_Params_MBComp:
 
 
 
-def open_midi_ports(args):
+def open_midi_ports(midi_in_port, midi_out_port):
     midi_in = rtmidi.MidiIn()
-    if args.midi_in:
+    if midi_in_port:
         try:
-            index = midi_in.get_ports().index(args.midi_in)
+            index = midi_in.get_ports().index(midi_in_port)
         except ValueError:
-            print(f'Cannot find input midi port {args.midi_in}')
+            print(f'Cannot find input midi port {midi_in_port}')
             sys.exit(1)
     else:
         index = -1
@@ -551,11 +551,11 @@ def open_midi_ports(args):
     midi_in.ignore_types(sysex=False)
 
     midi_out = rtmidi.MidiOut()
-    if args.midi_out:
+    if midi_out_port:
         try:
-            index = midi_out.get_ports().index(args.midi_out)
+            index = midi_out.get_ports().index(midi_out_port)
         except ValueError:
-            print(f'Cannot find input midi port {args.midi_out}')
+            print(f'Cannot find input midi port {midi_out_port}')
             sys.exit(1)
     else:
         index = -1
@@ -656,7 +656,7 @@ def main():
 
 
     elif args.get_parameter:
-        midi_in, midi_out = open_midi_ports(args)
+        midi_in, midi_out = open_midi_ports(args.midi_in, args.midi_out)
         ur44c = UR44C(midi_in, midi_out)
         value = ur44c.GetParameterByName(unit, args.get_parameter, args.input-1)
         if args.verbose:
@@ -695,7 +695,7 @@ def main():
         ur44c.ResetConfig()
 
     elif args.test:
-        midi_in, midi_out = open_midi_ports(args)
+        midi_in, midi_out = open_midi_ports(args.midi_in, args.midi_out)
         ur44c = UR44C(midi_in, midi_out)
         for i in range(8):
             ur44c.SetParameterByName(UR44C_Params_Mixer, 'MainMix1Volume', 30, 0)
