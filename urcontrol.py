@@ -29,8 +29,8 @@ class UR44C():
         self.received_params = {}
         self.received_param_event = threading.Event()
 
-    @classmethod
-    def _sysex_parser(cls, message):
+
+    def _sysex_parser(self, message):
         #change parameter message
         if len(message)==19 and message[:8]==[0xF0, 0x43, 0x10, 0x3E, 0x14, 0x01, 0x01, 0x00]:
             param = message[8]*128 + message[9]
@@ -69,6 +69,13 @@ class UR44C():
         elif message==[0xF0, 0x43, 0x10, 0x3E, 0x14, 0x00, 0x04, 0x02, 0xF7]:
             return {'type': 'keepalive'}
 
+        #meters
+        elif message[0:7] == [240, 67, 16, 62, 20, 2, 3]:
+            # parsear mensaje
+            # print('entered')
+            self.meters = self.parse_meters(message)
+            return {'type': 'meters'}
+
         return {'type': 'unknown'}
 
 
@@ -78,6 +85,25 @@ class UR44C():
         if res['type']=='reply-parameter':
             obj.received_params[(res['channel'], res['param'])] = res['value']
             obj.received_param_event.set()
+
+
+    def parse_meters(self, message):
+        meter_array = []
+        for i in range(0,47):
+            curr_v0 = message[7+4*i+0]
+            curr_v1 = message[7+4*i+1]
+            peak_v0 = message[7+4*i+2]
+            peak_v1 = message[7+4*i+3]
+
+            curr_v0 = curr_v0-128 if curr_v0 > 64 else curr_v0
+            curr_val = curr_v0*128 + curr_v1
+
+            peak_v0 = peak_v0-128 if peak_v0 > 64 else peak_v0
+            peak_val = peak_v0*128 + peak_v1
+
+            meter_array.append({'index':i,'value':curr_val, 'peak': peak_val})
+
+        return meter_array
 
 
     def MIDISendChangeParameterValue(self, parameter, value, channel=0):
