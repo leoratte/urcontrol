@@ -557,7 +557,7 @@ class UR44C_Params_MBComp:
 
 
 
-def open_midi_ports(midi_in_port, midi_out_port):
+def open_midi_ports(midi_in_port = None, midi_out_port = None):
     midi_in = rtmidi.MidiIn()
     if midi_in_port:
         try:
