@@ -101,33 +101,6 @@ class Pan(QWidget):
         self.setLayout(vlayout)
 
 
-class Input(QWidget):
-    def __init__(self, channel_no):
-        super().__init__()
-
-        vlayout = QVBoxLayout()
-        hlayout = QHBoxLayout()
-
-        name_label = QLabel(f"Input {channel_no}")
-        mbutton = QPushButton("M")
-        sbutton = QPushButton("S")
-
-        mbutton.setFixedWidth(20)
-        sbutton.setFixedWidth(20)
-
-        hlayout.addWidget(mbutton)
-        hlayout.addWidget(sbutton)
-
-        vlayout.addWidget(Send(channel_no))
-        vlayout.addWidget(Pan(channel_no))
-        vlayout.addLayout(hlayout)
-        vlayout.addWidget(Fader(channel_no))
-        vlayout.addWidget(name_label)
-        vlayout.setAlignment(name_label, Qt.AlignCenter)
-
-        self.setLayout(vlayout)
-
-
 class Fader(QWidget):
     @Slot()
     def slide(self, pos):
@@ -155,6 +128,33 @@ class Fader(QWidget):
         self.setLayout(layout)
 
         slider.valueChanged.connect(self.slide)
+
+
+class Input(QWidget):
+    def __init__(self, channel_no):
+        super().__init__()
+
+        vlayout = QVBoxLayout()
+        hlayout = QHBoxLayout()
+
+        name_label = QLabel(f"Input {channel_no}")
+        mbutton = QPushButton("M")
+        sbutton = QPushButton("S")
+
+        mbutton.setFixedWidth(20)
+        sbutton.setFixedWidth(20)
+
+        hlayout.addWidget(mbutton)
+        hlayout.addWidget(sbutton)
+
+        vlayout.addWidget(Send(channel_no))
+        vlayout.addWidget(Pan(channel_no))
+        vlayout.addLayout(hlayout)
+        vlayout.addWidget(Fader(channel_no))
+        vlayout.addWidget(name_label)
+        vlayout.setAlignment(name_label, Qt.AlignCenter)
+
+        self.setLayout(vlayout)
 
 
 class Dialog(QDialog):
