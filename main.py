@@ -16,6 +16,7 @@ class Channel(QWidget):
     def __init__(self):
         super().__init__()
 
+        vlayout = QVBoxLayout()
         hlayout = QHBoxLayout()
 
         mbutton = QPushButton("M")
@@ -27,7 +28,10 @@ class Channel(QWidget):
         hlayout.addWidget(mbutton)
         hlayout.addWidget(sbutton)
 
-        self.setLayout(hlayout)
+        vlayout.addWidget(QDial())
+        vlayout.addLayout(hlayout)
+
+        self.setLayout(vlayout)
 
         # TODO: add mute
         # TODO: add solo
@@ -40,6 +44,8 @@ class Fader(QWidget):
 
         layout = QVBoxLayout()
 
+        channel = Channel()
+
         slider = QSlider()
         slider.setRange(0, 127)
 
@@ -51,6 +57,11 @@ class Fader(QWidget):
         layout.addWidget(val_label)
         layout.addWidget(name_label)
 
+        layout.setAlignment(channel, Qt.AlignCenter)
+        layout.setAlignment(slider, Qt.AlignCenter)
+        layout.setAlignment(val_label, Qt.AlignCenter)
+        layout.setAlignment(name_label, Qt.AlignCenter)
+        
         self.setLayout(layout)
 
 class Dialog(QDialog):
