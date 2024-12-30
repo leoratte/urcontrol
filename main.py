@@ -12,6 +12,37 @@ from PySide6.QtWidgets import (QApplication, QDialog, QLayout, QGridLayout,
                                QComboBox, QLabel, QVBoxLayout, QHBoxLayout)
 
 
+class Pan(QWidget):
+    @Slot()
+    def dial(self, pos):
+        if pos < 0:
+            self.label.setText(f"L{-pos}")
+        elif pos == 0:
+            self.label.setText("C")
+        if pos > 0:
+            self.label.setText(f"R{pos}")
+
+
+    def __init__(self, channel_no):
+        super().__init__()
+
+        vlayout = QVBoxLayout()
+
+        dial = QDial()
+        dial.valueChanged.connect(self.dial)
+        dial.setRange(-16, 16)
+
+        self.label = QLabel("C")
+
+        vlayout.addWidget(dial)
+        vlayout.addWidget(self.label)
+
+        vlayout.setAlignment(dial, Qt.AlignCenter)
+        vlayout.setAlignment(self.label, Qt.AlignCenter)
+
+        self.setLayout(vlayout)
+
+
 class Channel(QWidget):
     def __init__(self, channel_no):
         super().__init__()
@@ -28,15 +59,12 @@ class Channel(QWidget):
         hlayout.addWidget(mbutton)
         hlayout.addWidget(sbutton)
 
-        vlayout.addWidget(QDial())
+        vlayout.addWidget(Pan(channel_no))
         vlayout.addLayout(hlayout)
         vlayout.addWidget(Fader(channel_no))
 
-
         self.setLayout(vlayout)
 
-        # TODO: add mute
-        # TODO: add solo
         # TODO: add send
 
 
@@ -83,7 +111,7 @@ class Fader(QWidget):
         layout.setAlignment(slider, Qt.AlignCenter)
         layout.setAlignment(self.val_label, Qt.AlignCenter)
         layout.setAlignment(name_label, Qt.AlignCenter)
-        
+
         self.setLayout(layout)
 
         slider.valueChanged.connect(self.slide)
