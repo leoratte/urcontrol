@@ -108,6 +108,7 @@ class Channel(QWidget):
         vlayout = QVBoxLayout()
         hlayout = QHBoxLayout()
 
+        name_label = QLabel(f"Input {channel_no}")
         mbutton = QPushButton("M")
         sbutton = QPushButton("S")
 
@@ -121,6 +122,8 @@ class Channel(QWidget):
         vlayout.addWidget(Pan(channel_no))
         vlayout.addLayout(hlayout)
         vlayout.addWidget(Fader(channel_no))
+        vlayout.addWidget(name_label)
+        vlayout.setAlignment(name_label, Qt.AlignCenter)
 
         self.setLayout(vlayout)
 
@@ -142,19 +145,17 @@ class Fader(QWidget):
         slider.setRange(0, 127)
 
         self.val_label = QLabel("-∞")
-        name_label = QLabel(f"Input {channel_no}")
 
         layout.addWidget(slider)
         layout.addWidget(self.val_label)
-        layout.addWidget(name_label)
 
         layout.setAlignment(slider, Qt.AlignCenter)
         layout.setAlignment(self.val_label, Qt.AlignCenter)
-        layout.setAlignment(name_label, Qt.AlignCenter)
 
         self.setLayout(layout)
 
         slider.valueChanged.connect(self.slide)
+
 
 class Dialog(QDialog):
     def __init__(self):
