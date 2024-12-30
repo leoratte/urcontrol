@@ -51,6 +51,7 @@ class Send(QWidget):
 
         dialer = QDial()
         dialer.setRange(0, 127)
+        dialer.setFixedSize(60, 60)
 
         self.val_label = QLabel("-∞")
         name_label = QLabel(f"Input {channel_no}")
@@ -86,6 +87,8 @@ class Pan(QWidget):
         dial = QDial()
         dial.valueChanged.connect(self.dial)
         dial.setRange(-16, 16)
+        dial.setFixedSize(60, 60)
+
 
         self.label = QLabel("C")
 
