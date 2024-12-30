@@ -101,7 +101,7 @@ class Pan(QWidget):
         self.setLayout(vlayout)
 
 
-class Channel(QWidget):
+class Input(QWidget):
     def __init__(self, channel_no):
         super().__init__()
 
@@ -162,12 +162,12 @@ class Dialog(QDialog):
         super().__init__()
 
         main_layout = QHBoxLayout()
-        main_layout.addWidget(Channel(1))
-        main_layout.addWidget(Channel(2))
-        main_layout.addWidget(Channel(3))
-        main_layout.addWidget(Channel(4))
-        main_layout.addWidget(Channel(5))
-        main_layout.addWidget(Channel(6))
+        main_layout.addWidget(Input(1))
+        main_layout.addWidget(Input(2))
+        main_layout.addWidget(Input(3))
+        main_layout.addWidget(Input(4))
+        main_layout.addWidget(Input(5))
+        main_layout.addWidget(Input(6))
 
         self._main_layout = main_layout
         self.setLayout(self._main_layout)
