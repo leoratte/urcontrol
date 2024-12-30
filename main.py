@@ -11,6 +11,59 @@ from PySide6.QtWidgets import (QApplication, QDialog, QLayout, QGridLayout,
                                QProgressBar, QDial, QDialogButtonBox, QWidget,
                                QComboBox, QLabel, QVBoxLayout, QHBoxLayout)
 
+def slider2dB(pos):
+    if pos == 0:
+        label = "-∞"
+    elif pos > 0 and pos <= 13:
+        # -74B to -50dB (step size: 2)
+        val = -74 + ((pos - 1) * 2)
+        label = f"{val}"
+    elif pos > 13 and pos <= 43:
+        # -50dB to -20dB (step size: 1)
+        val = -50 + (pos - 13)
+        label = f"{val}"
+    elif pos > 43 and pos <= 63:
+        # -52dB to -10dB (step size: 0.5)
+        val = -20 + ((pos - 43) * 0.5)
+        label = f"{val}"
+    else:
+        # -10dB to 6dB (step size: 0.25)
+        val = -10 + ((pos - 63) * 0.25)
+        label = f"{val}"
+
+    return label
+
+
+class Send(QWidget):
+    @Slot()
+    def dial(self, pos):
+        label = slider2dB(pos)
+
+        self.val_label.setText(label)
+
+
+    def __init__(self, channel_no):
+        super().__init__()
+
+        layout = QVBoxLayout()
+
+        dialer = QDial()
+        dialer.setRange(0, 127)
+
+        self.val_label = QLabel("-∞")
+        name_label = QLabel(f"Input {channel_no}")
+
+        layout.addWidget(dialer)
+        layout.addWidget(self.val_label)
+
+        layout.setAlignment(dialer, Qt.AlignCenter)
+        layout.setAlignment(self.val_label, Qt.AlignCenter)
+
+        self.setLayout(layout)
+
+        dialer.valueChanged.connect(self.dial)
+
+
 
 class Pan(QWidget):
     @Slot()
@@ -59,36 +112,18 @@ class Channel(QWidget):
         hlayout.addWidget(mbutton)
         hlayout.addWidget(sbutton)
 
+        vlayout.addWidget(Send(channel_no))
         vlayout.addWidget(Pan(channel_no))
         vlayout.addLayout(hlayout)
         vlayout.addWidget(Fader(channel_no))
 
         self.setLayout(vlayout)
 
-        # TODO: add send
-
 
 class Fader(QWidget):
     @Slot()
     def slide(self, pos):
-        if pos == 0:
-            label = "-∞"
-        elif pos > 0 and pos <= 13:
-            # -74B to -50dB (step size: 2)
-            val = -74 + ((pos - 1) * 2)
-            label = f"{val}"
-        elif pos > 13 and pos <= 43:
-            # -50dB to -20dB (step size: 1)
-            val = -50 + (pos - 13)
-            label = f"{val}"
-        elif pos > 43 and pos <= 63:
-            # -52dB to -10dB (step size: 0.5)
-            val = -20 + ((pos - 43) * 0.5)
-            label = f"{val}"
-        else:
-            # -10dB to 6dB (step size: 0.25)
-            val = -10 + ((pos - 63) * 0.25)
-            label = f"{val}"
+        label = slider2dB(pos)
 
         self.val_label.setText(label)
 
