@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QLayout, QGridLayout,
 
 
 class Channel(QWidget):
-    def __init__(self):
+    def __init__(self, channel_no):
         super().__init__()
 
         vlayout = QVBoxLayout()
@@ -30,6 +30,8 @@ class Channel(QWidget):
 
         vlayout.addWidget(QDial())
         vlayout.addLayout(hlayout)
+        vlayout.addWidget(Fader(channel_no))
+
 
         self.setLayout(vlayout)
 
@@ -44,20 +46,16 @@ class Fader(QWidget):
 
         layout = QVBoxLayout()
 
-        channel = Channel()
-
         slider = QSlider()
         slider.setRange(0, 127)
 
         val_label = QLabel("-∞")
         name_label = QLabel(f"Input {channel_no}")
 
-        layout.addWidget(channel)
         layout.addWidget(slider)
         layout.addWidget(val_label)
         layout.addWidget(name_label)
 
-        layout.setAlignment(channel, Qt.AlignCenter)
         layout.setAlignment(slider, Qt.AlignCenter)
         layout.setAlignment(val_label, Qt.AlignCenter)
         layout.setAlignment(name_label, Qt.AlignCenter)
@@ -69,12 +67,12 @@ class Dialog(QDialog):
         super().__init__()
 
         main_layout = QHBoxLayout()
-        main_layout.addWidget(Fader(1))
-        main_layout.addWidget(Fader(2))
-        main_layout.addWidget(Fader(3))
-        main_layout.addWidget(Fader(4))
-        main_layout.addWidget(Fader(5))
-        main_layout.addWidget(Fader(6))
+        main_layout.addWidget(Channel(1))
+        main_layout.addWidget(Channel(2))
+        main_layout.addWidget(Channel(3))
+        main_layout.addWidget(Channel(4))
+        main_layout.addWidget(Channel(5))
+        main_layout.addWidget(Channel(6))
 
         self._main_layout = main_layout
         self.setLayout(self._main_layout)
