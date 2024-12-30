@@ -10,6 +10,8 @@ from PySide6.QtWidgets import (QApplication, QDialog, QLayout, QGridLayout,
                                QMessageBox, QGroupBox, QSpinBox, QSlider, QPushButton,
                                QProgressBar, QDial, QDialogButtonBox, QWidget,
                                QComboBox, QLabel, QVBoxLayout, QHBoxLayout)
+from PySide6.QtGui import QPalette, QColor
+
 
 def slider2dB(pos):
     if pos == 0:
@@ -168,9 +170,35 @@ class Dialog(QDialog):
 
         self.setWindowTitle("Dynamic Layouts")
 
+
+def enable_dark_mode(app):
+    dark_palette = QPalette()
+
+    # Set dark background
+    dark_palette.setColor(QPalette.Window, QColor(53, 53, 53))
+    dark_palette.setColor(QPalette.WindowText, QColor(255, 255, 255))
+    dark_palette.setColor(QPalette.Base, QColor(42, 42, 42))
+    dark_palette.setColor(QPalette.AlternateBase, QColor(66, 66, 66))
+    dark_palette.setColor(QPalette.ToolTipBase, QColor(255, 255, 255))
+    dark_palette.setColor(QPalette.ToolTipText, QColor(255, 255, 255))
+    dark_palette.setColor(QPalette.Text, QColor(255, 255, 255))
+    dark_palette.setColor(QPalette.Button, QColor(53, 53, 53))
+    dark_palette.setColor(QPalette.ButtonText, QColor(255, 255, 255))
+    dark_palette.setColor(QPalette.BrightText, QColor(255, 0, 0))
+
+    # Highlight colors
+    dark_palette.setColor(QPalette.Highlight, QColor(142, 45, 197).lighter())
+    dark_palette.setColor(QPalette.HighlightedText, QColor(255, 255, 255))
+
+    # Set the palette
+    app.setPalette(dark_palette)
+
+
 if __name__ == '__main__':
     import sys
 
     app = QApplication(sys.argv)
+    enable_dark_mode(app)
+
     dialog = Dialog()
     dialog.exec()
