@@ -9,7 +9,8 @@ from PySide6.QtCore import Qt, QSize, Signal, Slot
 from PySide6.QtWidgets import (QApplication, QDialog, QLayout, QGridLayout,
                                QMessageBox, QGroupBox, QSpinBox, QSlider, QPushButton,
                                QProgressBar, QDial, QDialogButtonBox, QWidget,
-                               QComboBox, QLabel, QVBoxLayout, QHBoxLayout)
+                               QComboBox, QLabel, QVBoxLayout, QHBoxLayout, QSpacerItem,
+                               QSizePolicy)
 from PySide6.QtGui import QPalette, QColor
 
 
@@ -157,6 +158,89 @@ class Input(QWidget):
         self.setLayout(vlayout)
 
 
+class DAWInput(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        vlayout = QVBoxLayout()
+        hlayout = QHBoxLayout()
+
+        name_label = QLabel(f"DAW")
+        spacer = QSpacerItem(50, 50, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        mbutton = QPushButton("M")
+        sbutton = QPushButton("S")
+
+        mbutton.setFixedWidth(20)
+        sbutton.setFixedWidth(20)
+
+        hlayout.addWidget(mbutton)
+        hlayout.addWidget(sbutton)
+
+        vlayout.addItem(spacer)
+        vlayout.addWidget(Pan(0))
+        vlayout.addLayout(hlayout)
+        vlayout.addWidget(Fader(0))
+        vlayout.addWidget(name_label)
+        vlayout.setAlignment(name_label, Qt.AlignCenter)
+
+        self.setLayout(vlayout)
+
+
+class VoiceMusicInput(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        vlayout = QVBoxLayout()
+        hlayout = QHBoxLayout()
+
+        spacer = QSpacerItem(50, 50, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        name_label = QLabel(f"Music")
+        mbutton = QPushButton("M")
+        sbutton = QPushButton("S")
+
+        mbutton.setFixedWidth(20)
+        sbutton.setFixedWidth(20)
+
+        hlayout.addWidget(mbutton)
+        hlayout.addWidget(sbutton)
+
+        vlayout.addItem(spacer)
+        vlayout.addWidget(Pan(0))
+        vlayout.addLayout(hlayout)
+        vlayout.addWidget(Fader(0))
+        vlayout.addWidget(name_label)
+        vlayout.setAlignment(name_label, Qt.AlignCenter)
+
+        self.setLayout(vlayout)
+
+
+class VoiceInput(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        vlayout = QVBoxLayout()
+        hlayout = QHBoxLayout()
+
+        name_label = QLabel(f"Voice")
+        spacer = QSpacerItem(50, 50, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        mbutton = QPushButton("M")
+        sbutton = QPushButton("S")
+
+        mbutton.setFixedWidth(20)
+        sbutton.setFixedWidth(20)
+
+        hlayout.addWidget(mbutton)
+        hlayout.addWidget(sbutton)
+
+        vlayout.addItem(spacer)
+        vlayout.addWidget(Pan(0))
+        vlayout.addLayout(hlayout)
+        vlayout.addWidget(Fader(0))
+        vlayout.addWidget(name_label)
+        vlayout.setAlignment(name_label, Qt.AlignCenter)
+
+        self.setLayout(vlayout)
+
 class Dialog(QDialog):
     def __init__(self):
         super().__init__()
@@ -168,6 +252,9 @@ class Dialog(QDialog):
         main_layout.addWidget(Input(4))
         main_layout.addWidget(Input(5))
         main_layout.addWidget(Input(6))
+        main_layout.addWidget(DAWInput())
+        main_layout.addWidget(MusicInput())
+        main_layout.addWidget(VoiceInput())
 
         self._main_layout = main_layout
         self.setLayout(self._main_layout)
