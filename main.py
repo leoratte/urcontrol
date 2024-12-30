@@ -5,7 +5,7 @@ from __future__ import annotations
 
 """PySide6 port of the widgets/layouts/dynamiclayouts example from Qt v5.x"""
 
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import Qt, QSize, Signal, Slot
 from PySide6.QtWidgets import (QApplication, QDialog, QLayout, QGridLayout,
                                QMessageBox, QGroupBox, QSpinBox, QSlider, QPushButton,
                                QProgressBar, QDial, QDialogButtonBox, QWidget,
@@ -41,6 +41,30 @@ class Channel(QWidget):
 
 
 class Fader(QWidget):
+    @Slot()
+    def slide(self, pos):
+        if pos == 0:
+            label = "-∞"
+        elif pos > 0 and pos <= 13:
+            # -74B to -50dB (step size: 2)
+            val = -74 + ((pos - 1) * 2)
+            label = f"{val}"
+        elif pos > 13 and pos <= 43:
+            # -50dB to -20dB (step size: 1)
+            val = -50 + (pos - 13)
+            label = f"{val}"
+        elif pos > 43 and pos <= 63:
+            # -52dB to -10dB (step size: 0.5)
+            val = -20 + ((pos - 43) * 0.5)
+            label = f"{val}"
+        else:
+            # -10dB to 6dB (step size: 0.25)
+            val = -10 + ((pos - 63) * 0.25)
+            label = f"{val}"
+
+        self.val_label.setText(label)
+
+
     def __init__(self, channel_no):
         super().__init__()
 
@@ -49,18 +73,20 @@ class Fader(QWidget):
         slider = QSlider()
         slider.setRange(0, 127)
 
-        val_label = QLabel("-∞")
+        self.val_label = QLabel("-∞")
         name_label = QLabel(f"Input {channel_no}")
 
         layout.addWidget(slider)
-        layout.addWidget(val_label)
+        layout.addWidget(self.val_label)
         layout.addWidget(name_label)
 
         layout.setAlignment(slider, Qt.AlignCenter)
-        layout.setAlignment(val_label, Qt.AlignCenter)
+        layout.setAlignment(self.val_label, Qt.AlignCenter)
         layout.setAlignment(name_label, Qt.AlignCenter)
         
         self.setLayout(layout)
+
+        slider.valueChanged.connect(self.slide)
 
 class Dialog(QDialog):
     def __init__(self):
