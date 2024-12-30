@@ -35,15 +35,21 @@ class Channel(QWidget):
 
 
 class Fader(QWidget):
-    def __init__(self, channel):
+    def __init__(self, channel_no):
         super().__init__()
 
         layout = QVBoxLayout()
 
-        layout.addWidget(Channel())
-        layout.addWidget(QSlider())
-        layout.addWidget(QLabel("-∞"))
-        layout.addWidget(QLabel(f"Input {channel}"))
+        slider = QSlider()
+        slider.setRange(0, 127)
+
+        val_label = QLabel("-∞")
+        name_label = QLabel(f"Input {channel_no}")
+
+        layout.addWidget(channel)
+        layout.addWidget(slider)
+        layout.addWidget(val_label)
+        layout.addWidget(name_label)
 
         self.setLayout(layout)
 
