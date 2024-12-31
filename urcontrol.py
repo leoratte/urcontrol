@@ -3,7 +3,6 @@
 import sys
 import os
 import argparse
-import threading
 import time
 from ur44c import *
 import utils
