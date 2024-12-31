@@ -6,47 +6,9 @@ import argparse
 import threading
 import time
 from ur44c import *
+import utils
 
 import rtmidi
-
-def open_midi_ports(midi_in_port = None, midi_out_port = None):
-    midi_in = rtmidi.MidiIn()
-    if midi_in_port:
-        try:
-            index = midi_in.get_ports().index(midi_in_port)
-        except ValueError:
-            print(f'Cannot find input midi port {midi_in_port}')
-            sys.exit(1)
-    else:
-        index = -1
-        for i, v in enumerate(midi_in.get_ports()):
-            if 'Steinberg UR' in v:
-                index = i
-        if index == -1:
-            print(f'Cannot find Steinberg UR device')
-            sys.exit(1)
-    midi_in.open_port(index)
-    midi_in.ignore_types(sysex=False)
-
-    midi_out = rtmidi.MidiOut()
-    if midi_out_port:
-        try:
-            index = midi_out.get_ports().index(midi_out_port)
-        except ValueError:
-            print(f'Cannot find input midi port {midi_out_port}')
-            sys.exit(1)
-    else:
-        index = -1
-        for i, v in enumerate(midi_out.get_ports()):
-            if 'Steinberg UR' in v:
-                index = i
-        if index == -1:
-            print(f'Cannot find Steinberg UR device')
-            sys.exit(1)
-    midi_out.open_port(index)
-
-    return midi_in, midi_out
-
 
 
 def main():
@@ -101,12 +63,7 @@ def main():
         raise Exception('Unit does not exists')
 
     if args.get_midi_ports:
-        print('Input:')
-        for port in rtmidi.MidiIn().get_ports():
-            print(f'  {port}')
-        print('Output:')
-        for port in rtmidi.MidiOut().get_ports():
-            print(f'  {port}')
+        utils.print_midi_ports()
     elif args.list_units:
         print('mixer')
         print('chstrip')
@@ -167,13 +124,12 @@ def main():
             sys.exit(1)
 
     elif args.reset:
-        midi_in = rtmidi.MidiIn().open_port(0)
-        midi_out = rtmidi.MidiOut().open_port(0)
+        midi_in, midi_out = utils.open_midi_ports(args.midi_in, args.midi_out)
         ur44c = UR44C(midi_in, midi_out)
         ur44c.ResetConfig()
 
     elif args.test:
-        midi_in, midi_out = open_midi_ports(args.midi_in, args.midi_out)
+        midi_in, midi_out = utils.open_midi_ports(args.midi_in, args.midi_out)
         ur44c = UR44C(midi_in, midi_out)
         for i in range(8):
             ur44c.SetParameterByName(UR44C_Params_Mixer, 'MainMix1Volume', 30, 0)
