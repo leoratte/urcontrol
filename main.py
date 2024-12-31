@@ -11,6 +11,12 @@ from PySide6.QtWidgets import (QApplication, QDialog, QLayout, QGridLayout,
 from PySide6.QtGui import QPalette, QColor
 
 
+import utils
+import argparse
+from ur44c import *
+
+ur44c = None
+
 
 class Send(QWidget):
     @Slot()
@@ -78,8 +84,15 @@ class Pan(QWidget):
 
 
 class Fader(QWidget):
+    category = UR44C_Params_Mixer
+    parameter = "InputMix1Volume"
+    channel_no = 0
+
     @Slot()
     def slide(self, pos):
+        if not ur44c.SetParameterByName(self.category, self.parameter, pos, self.channel_no):
+            exit(1)
+
         label = utils.slider2dB(pos)
 
         self.val_label.setText(label)
@@ -88,10 +101,17 @@ class Fader(QWidget):
     def __init__(self, channel_no):
         super().__init__()
 
+        self.channel_no = channel_no
+
+        val = ur44c.GetParameterByName(self.category, self.parameter, self.channel_no)
+        if val == None:
+            exit(1)
+
         layout = QVBoxLayout()
 
         slider = QSlider()
         slider.setRange(0, 127)
+        slider.setValue(val)
 
         self.val_label = QLabel(utils.slider2dB(val))
 
@@ -113,7 +133,7 @@ class Input(QWidget):
         vlayout = QVBoxLayout()
         hlayout = QHBoxLayout()
 
-        name_label = QLabel(f"Input {channel_no}")
+        name_label = QLabel(f"Input {channel_no+1}")
         mbutton = QPushButton("M")
         sbutton = QPushButton("S")
 
@@ -161,7 +181,7 @@ class DAWInput(QWidget):
         self.setLayout(vlayout)
 
 
-class VoiceMusicInput(QWidget):
+class MusicInput(QWidget):
     def __init__(self):
         super().__init__()
 
@@ -221,12 +241,12 @@ class Dialog(QDialog):
         super().__init__()
 
         main_layout = QHBoxLayout()
+        main_layout.addWidget(Input(0))
         main_layout.addWidget(Input(1))
         main_layout.addWidget(Input(2))
         main_layout.addWidget(Input(3))
         main_layout.addWidget(Input(4))
         main_layout.addWidget(Input(5))
-        main_layout.addWidget(Input(6))
         main_layout.addWidget(DAWInput())
         main_layout.addWidget(MusicInput())
         main_layout.addWidget(VoiceInput())
@@ -234,7 +254,7 @@ class Dialog(QDialog):
         self._main_layout = main_layout
         self.setLayout(self._main_layout)
 
-        self.setWindowTitle("Dynamic Layouts")
+        self.setWindowTitle("URcontrol")
 
 
 def enable_dark_mode(app):
@@ -262,6 +282,23 @@ def enable_dark_mode(app):
 
 if __name__ == '__main__':
     import sys
+
+    formatter = lambda prog: argparse.HelpFormatter(prog,max_help_position=45)
+    parser = argparse.ArgumentParser(description='Command line tool to control UR44C by MIDI', formatter_class=formatter)
+
+    parser.add_argument('--midi-in', '-mi', action='store', help='Input MIDI port', metavar='PORT', default='')
+    parser.add_argument('--midi-out', '-mo', action='store', help='Output MIDI port', metavar='PORT', default='')
+    parser.add_argument('--get-midi-ports', '-m', action='store_true', help='Show MIDI ports in system')
+
+    args = parser.parse_args()
+
+    if args.get_midi_ports:
+        utils.print_midi_ports()
+        exit(0)
+
+    midi_in, midi_out = utils.open_midi_ports(args.midi_in, args.midi_out)
+
+    ur44c = UR44C(midi_in, midi_out)
 
     app = QApplication(sys.argv)
     enable_dark_mode(app)
