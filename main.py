@@ -284,7 +284,7 @@ if __name__ == '__main__':
     import sys
 
     formatter = lambda prog: argparse.HelpFormatter(prog,max_help_position=45)
-    parser = argparse.ArgumentParser(description='Command line tool to control UR44C by MIDI', formatter_class=formatter)
+    parser = argparse.ArgumentParser(description='GUI to control UR44C by MIDI', formatter_class=formatter)
 
     parser.add_argument('--midi-in', '-mi', action='store', help='Input MIDI port', metavar='PORT', default='')
     parser.add_argument('--midi-out', '-mo', action='store', help='Output MIDI port', metavar='PORT', default='')
