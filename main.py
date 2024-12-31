@@ -18,9 +18,26 @@ from ur44c import *
 ur44c = None
 
 
+WHITE = QColor(255, 255, 255)
+BUTTON = WHITE
+BUTTON_SET = QColor(255, 136, 0)
+VERY_DARK = QColor(53, 53, 53)
+SUPER_DARK = QColor(42, 42, 42)
+DARK = QColor(66, 66, 66)
+RED = QColor(255, 0, 0)
+HIGHLIGHT = QColor(142, 45, 197).lighter()
+
+
 class Send(QWidget):
+    category = UR44C_Params_Mixer
+    parameter = "InputReverbSend"
+    channel_no = 0
+
     @Slot()
     def dial(self, pos):
+        if not ur44c.SetParameterByName(self.category, self.parameter, pos, self.channel_no):
+            exit(1)
+
         label = utils.slider2dB(pos)
 
         self.val_label.setText(label)
@@ -29,13 +46,20 @@ class Send(QWidget):
     def __init__(self, channel_no):
         super().__init__()
 
+        self.channel_no = channel_no
+
+        val = ur44c.GetParameterByName(self.category, self.parameter, self.channel_no)
+        if val == None:
+            exit(1)
+
         layout = QVBoxLayout()
 
         dialer = QDial()
         dialer.setRange(0, 127)
         dialer.setFixedSize(60, 60)
+        dialer.setValue(val)
 
-        self.val_label = QLabel("-∞")
+        self.val_label = QLabel(utils.slider2dB(val))
         name_label = QLabel(f"Input {channel_no}")
 
         layout.addWidget(dialer)
@@ -51,29 +75,35 @@ class Send(QWidget):
 
 
 class Pan(QWidget):
+    category = UR44C_Params_Mixer
+    parameter = "InputMix1Pan"
+    channel_no = 0
+
     @Slot()
     def dial(self, pos):
-        if pos < 0:
-            self.label.setText(f"L{-pos}")
-        elif pos == 0:
-            self.label.setText("C")
-        if pos > 0:
-            self.label.setText(f"R{pos}")
+        if not ur44c.SetParameterByName(self.category, self.parameter, pos, self.channel_no):
+            exit(1)
 
+        self.label.setText(utils.pan2Label(pos))
 
     def __init__(self, channel_no):
         super().__init__()
 
-        vlayout = QVBoxLayout()
+        self.channel_no = channel_no
+
+        val = ur44c.GetParameterByName(self.category, self.parameter, self.channel_no)
+        if val == None:
+            exit(1)
+
+        self.label = QLabel(utils.pan2Label(val))
 
         dial = QDial()
         dial.valueChanged.connect(self.dial)
         dial.setRange(-16, 16)
         dial.setFixedSize(60, 60)
+        dial.setValue(val)
 
-
-        self.label = QLabel("C")
-
+        vlayout = QVBoxLayout()
         vlayout.addWidget(dial)
         vlayout.addWidget(self.label)
 
@@ -85,7 +115,7 @@ class Pan(QWidget):
 
 class Fader(QWidget):
     category = UR44C_Params_Mixer
-    parameter = "InputMix1Volume"
+    parameter = "Dummy"
     channel_no = 0
 
     @Slot()
@@ -98,10 +128,11 @@ class Fader(QWidget):
         self.val_label.setText(label)
 
 
-    def __init__(self, channel_no):
+    def __init__(self, channel_no, parameter="InputMix1Volume"):
         super().__init__()
 
         self.channel_no = channel_no
+        self.parameter = parameter
 
         val = ur44c.GetParameterByName(self.category, self.parameter, self.channel_no)
         if val == None:
@@ -126,6 +157,62 @@ class Fader(QWidget):
         slider.valueChanged.connect(self.slide)
 
 
+class Button(QPushButton):
+    category = UR44C_Params_Mixer
+    parameter = "Dummy"
+    channel_no = 0
+    state = False
+    colors = (WHITE, HIGHLIGHT)
+
+    def update_font(self):
+        palette = self.palette()
+        palette.setColor(self.foregroundRole(), self.colors[self.state])
+        self.setPalette(palette)
+        self.repaint()
+
+
+    def toggle(self):
+        self.state = not self.state
+        self.update_font()
+
+
+    @Slot()
+    def click(self):
+        self.toggle()
+
+        if not ur44c.SetParameterByName(self.category, self.parameter, self.state, self.channel_no):
+            exit(1)
+
+
+    def __init__(self, text, channel_no, parameter):
+        super().__init__(text)
+
+        self.channel_no = channel_no
+        self.parameter = parameter
+
+        val = ur44c.GetParameterByName(self.category, self.parameter, self.channel_no)
+        if val < 0 or val > 1:
+            exit(1)
+
+        self.state = bool(val)
+
+        self.update_font()
+
+        self.clicked.connect(self.click)
+
+
+class Mute(Button):
+    colors = (HIGHLIGHT, WHITE)
+
+    def __init__(self, channel_no, parameter):
+        super().__init__("M", channel_no, parameter)
+
+
+class Solo(Button):
+    def __init__(self, channel_no, parameter):
+        super().__init__("S", channel_no, parameter)
+
+
 class Input(QWidget):
     def __init__(self, channel_no):
         super().__init__()
@@ -134,8 +221,8 @@ class Input(QWidget):
         hlayout = QHBoxLayout()
 
         name_label = QLabel(f"Input {channel_no+1}")
-        mbutton = QPushButton("M")
-        sbutton = QPushButton("S")
+        mbutton = Mute(channel_no, "InputMix1Mute")
+        sbutton = Solo(channel_no, "InputMix1Solo")
 
         mbutton.setFixedWidth(20)
         sbutton.setFixedWidth(20)
@@ -146,7 +233,7 @@ class Input(QWidget):
         vlayout.addWidget(Send(channel_no))
         vlayout.addWidget(Pan(channel_no))
         vlayout.addLayout(hlayout)
-        vlayout.addWidget(Fader(channel_no))
+        vlayout.addWidget(Fader(channel_no, "InputMix1Volume"))
         vlayout.addWidget(name_label)
         vlayout.setAlignment(name_label, Qt.AlignCenter)
 
@@ -162,8 +249,8 @@ class DAWInput(QWidget):
 
         name_label = QLabel(f"DAW")
         spacer = QSpacerItem(50, 50, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        mbutton = QPushButton("M")
-        sbutton = QPushButton("S")
+        mbutton = Mute(0, "DAWMix1Mute")
+        sbutton = Solo(0, "DAWMix1Solo")
 
         mbutton.setFixedWidth(20)
         sbutton.setFixedWidth(20)
@@ -174,7 +261,7 @@ class DAWInput(QWidget):
         vlayout.addItem(spacer)
         vlayout.addWidget(Pan(0))
         vlayout.addLayout(hlayout)
-        vlayout.addWidget(Fader(0))
+        vlayout.addWidget(Fader(0, "DAWMix1Volume"))
         vlayout.addWidget(name_label)
         vlayout.setAlignment(name_label, Qt.AlignCenter)
 
@@ -190,8 +277,8 @@ class MusicInput(QWidget):
 
         spacer = QSpacerItem(50, 50, QSizePolicy.Minimum, QSizePolicy.Expanding)
         name_label = QLabel(f"Music")
-        mbutton = QPushButton("M")
-        sbutton = QPushButton("S")
+        mbutton = Mute(0, "MusicMix1Mute")
+        sbutton = Solo(0, "MusicMix1Solo")
 
         mbutton.setFixedWidth(20)
         sbutton.setFixedWidth(20)
@@ -202,7 +289,7 @@ class MusicInput(QWidget):
         vlayout.addItem(spacer)
         vlayout.addWidget(Pan(0))
         vlayout.addLayout(hlayout)
-        vlayout.addWidget(Fader(0))
+        vlayout.addWidget(Fader(0, "MusicMix1Volume"))
         vlayout.addWidget(name_label)
         vlayout.setAlignment(name_label, Qt.AlignCenter)
 
@@ -218,8 +305,8 @@ class VoiceInput(QWidget):
 
         name_label = QLabel(f"Voice")
         spacer = QSpacerItem(50, 50, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        mbutton = QPushButton("M")
-        sbutton = QPushButton("S")
+        mbutton = Mute(1, "MusicMix1Mute")
+        sbutton = Solo(1, "MusicMix1Solo")
 
         mbutton.setFixedWidth(20)
         sbutton.setFixedWidth(20)
@@ -230,11 +317,12 @@ class VoiceInput(QWidget):
         vlayout.addItem(spacer)
         vlayout.addWidget(Pan(0))
         vlayout.addLayout(hlayout)
-        vlayout.addWidget(Fader(0))
+        vlayout.addWidget(Fader(1, "MusicMix1Volume"))
         vlayout.addWidget(name_label)
         vlayout.setAlignment(name_label, Qt.AlignCenter)
 
         self.setLayout(vlayout)
+
 
 class Dialog(QDialog):
     def __init__(self):
@@ -261,20 +349,20 @@ def enable_dark_mode(app):
     dark_palette = QPalette()
 
     # Set dark background
-    dark_palette.setColor(QPalette.Window, QColor(53, 53, 53))
-    dark_palette.setColor(QPalette.WindowText, QColor(255, 255, 255))
-    dark_palette.setColor(QPalette.Base, QColor(42, 42, 42))
-    dark_palette.setColor(QPalette.AlternateBase, QColor(66, 66, 66))
-    dark_palette.setColor(QPalette.ToolTipBase, QColor(255, 255, 255))
-    dark_palette.setColor(QPalette.ToolTipText, QColor(255, 255, 255))
-    dark_palette.setColor(QPalette.Text, QColor(255, 255, 255))
-    dark_palette.setColor(QPalette.Button, QColor(53, 53, 53))
-    dark_palette.setColor(QPalette.ButtonText, QColor(255, 255, 255))
-    dark_palette.setColor(QPalette.BrightText, QColor(255, 0, 0))
+    dark_palette.setColor(QPalette.Window, VERY_DARK)
+    dark_palette.setColor(QPalette.WindowText, WHITE)
+    dark_palette.setColor(QPalette.Base, SUPER_DARK)
+    dark_palette.setColor(QPalette.AlternateBase, DARK)
+    dark_palette.setColor(QPalette.ToolTipBase, WHITE)
+    dark_palette.setColor(QPalette.ToolTipText, WHITE)
+    dark_palette.setColor(QPalette.Text, WHITE)
+    dark_palette.setColor(QPalette.Button, VERY_DARK)
+    dark_palette.setColor(QPalette.ButtonText, BUTTON)
+    dark_palette.setColor(QPalette.BrightText, RED)
 
     # Highlight colors
-    dark_palette.setColor(QPalette.Highlight, QColor(142, 45, 197).lighter())
-    dark_palette.setColor(QPalette.HighlightedText, QColor(255, 255, 255))
+    dark_palette.setColor(QPalette.Highlight, HIGHLIGHT)
+    dark_palette.setColor(QPalette.HighlightedText, WHITE)
 
     # Set the palette
     app.setPalette(dark_palette)

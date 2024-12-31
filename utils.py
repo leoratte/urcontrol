@@ -1,6 +1,14 @@
 import rtmidi
 
 
+def pan2Label(pos):
+    if pos < 0:
+        return f"L{-pos}"
+    elif pos == 0:
+        return "C"
+    if pos > 0:
+        return f"R{pos}"
+
 def slider2dB(pos):
     if pos == 0:
         label = "-∞"
