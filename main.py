@@ -371,8 +371,6 @@ def enable_dark_mode(app):
 
 
 if __name__ == '__main__':
-    import sys
-
     formatter = lambda prog: argparse.HelpFormatter(prog,max_help_position=45)
     parser = argparse.ArgumentParser(description='GUI to control UR44C by MIDI', formatter_class=formatter)
 
@@ -393,7 +391,7 @@ if __name__ == '__main__':
         midi_in, midi_out = utils.open_midi_ports(args.midi_in, args.midi_out)
         ur44c = UR44C(midi_in, midi_out)
 
-    app = QApplication(sys.argv)
+    app = QApplication()
     enable_dark_mode(app)
 
     dialog = Dialog()

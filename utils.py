@@ -1,4 +1,5 @@
 import rtmidi
+import sys
 
 
 def pan2Label(pos):
