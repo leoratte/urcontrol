@@ -203,20 +203,109 @@ class Button(QPushButton):
         self.clicked.connect(self.click)
 
 
+class FxEnable(Button):
+    def __init__(self, channel_no, parameter):
+        super().__init__("⏻", channel_no, parameter)
+
+        self.setFixedWidth(30)
+
+
+class FxEnable(Button):
+    def __init__(self, channel_no, parameter):
+        super().__init__("⏻", channel_no, parameter)
+
+        self.setFixedWidth(30)
+
+
+class FxEdit(Button):
+    def __init__(self, channel_no, parameter):
+        super().__init__("🖉", channel_no, parameter)
+
+        self.setFixedWidth(30)
+
+
+class FxRecord(Button):
+    def __init__(self, channel_no, parameter):
+        super().__init__("FX REC", channel_no, parameter)
+
+
+class FxSelect(QComboBox):
+    category = UR44C_Params_Mixer
+    parameter = "Dummy"
+    channel_no = 0
+
+
+    @Slot()
+    def select(self):
+        if not ur44c.SetParameterByName(self.category, self.parameter, self.currentIndex(), self.channel_no):
+            exit(1)
+
+
+    def __init__(self, channel_no, parameter):
+        super().__init__()
+
+        self.channel_no = channel_no
+        self.parameter = parameter
+
+        self.addItems(["No Effect", "Ch.Strip", "Clean", "Crunch", "Lead", "Drive", "Pitch Fix"])
+
+        self.currentIndexChanged.connect(self.select)
+
+
 class Mute(Button):
     colors = (HIGHLIGHT, WHITE)
 
     def __init__(self, channel_no, parameter):
         super().__init__("M", channel_no, parameter)
 
-        self.setFixedWidth(20)
+        self.setFixedWidth(30)
 
 
 class Solo(Button):
     def __init__(self, channel_no, parameter):
         super().__init__("S", channel_no, parameter)
 
-        self.setFixedWidth(20)
+        self.setFixedWidth(30)
+
+
+class Fx(QWidget):
+    def __init__(self, channel_no):
+        super().__init__()
+
+        self.channel_no = channel_no
+
+        vlayout = QVBoxLayout()
+        fx1_layout = QHBoxLayout()
+        fx2_layout = QHBoxLayout()
+
+        fx_record_button = FxRecord(channel_no, "InputFXRec")
+        fx1_enable_button = FxEnable(channel_no, "InputFX1Enabled")
+        fx1_edit_button = FxEdit(channel_no, "InputFX1Enabled")
+        fx1_select_dropdown = FxSelect(channel_no, "InputFX1Type")
+        fx2_enable_button = FxEnable(channel_no, "InputFX1Enabled")
+        fx2_edit_button = FxEdit(channel_no, "InputFX1Enabled")
+        fx2_select_dropdown = FxSelect(channel_no, "InputFX1Type")
+
+        spacer = QSpacerItem(15, 15, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+
+        vlayout.addWidget(fx_record_button)
+        vlayout.addItem(spacer)
+
+        fx1_layout.addWidget(fx1_enable_button)
+        fx1_layout.addWidget(fx1_edit_button)
+
+        vlayout.addLayout(fx1_layout)
+        vlayout.addWidget(fx1_select_dropdown)
+        vlayout.addItem(spacer)
+
+        fx2_layout.addWidget(fx2_enable_button)
+        fx2_layout.addWidget(fx2_edit_button)
+
+        vlayout.addLayout(fx2_layout)
+        vlayout.addWidget(fx2_select_dropdown)
+
+        self.setLayout(vlayout)
 
 
 class Input(QWidget):
@@ -233,6 +322,7 @@ class Input(QWidget):
         hlayout.addWidget(mbutton)
         hlayout.addWidget(sbutton)
 
+        vlayout.addWidget(Fx(channel_no))
         vlayout.addWidget(Send(channel_no))
         vlayout.addWidget(Pan(channel_no))
         vlayout.addLayout(hlayout)
