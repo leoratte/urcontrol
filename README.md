@@ -6,7 +6,7 @@ Probably will work with other models like UR22C, UR24C, and UR816C with minor ch
 
 The goal of this project is to replace dspMixFx, as it is not available for Linux and also doesn't work under Wine.
 
-Note: The GUI is in a very early state so far.
+Note: The GUI is in a very early state so far. Help in completing the GUI is very appreciated.
 
 ## Reverse Engineering
 
