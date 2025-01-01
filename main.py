@@ -13,7 +13,9 @@ from PySide6.QtGui import QPalette, QColor
 
 import utils
 import argparse
-from ur44c import *
+from URxxx.ur44c import *
+from URxxx.params import *
+from test.ur44c_mock import *
 
 ur44c = None
 
@@ -377,6 +379,7 @@ if __name__ == '__main__':
     parser.add_argument('--midi-in', '-mi', action='store', help='Input MIDI port', metavar='PORT', default='')
     parser.add_argument('--midi-out', '-mo', action='store', help='Output MIDI port', metavar='PORT', default='')
     parser.add_argument('--get-midi-ports', '-m', action='store_true', help='Show MIDI ports in system')
+    parser.add_argument('--test', '-t', action='store_true', help='Run in test mode (no physical device required)')
 
     args = parser.parse_args()
 
@@ -384,9 +387,11 @@ if __name__ == '__main__':
         utils.print_midi_ports()
         exit(0)
 
-    midi_in, midi_out = utils.open_midi_ports(args.midi_in, args.midi_out)
-
-    ur44c = UR44C(midi_in, midi_out)
+    if args.test:
+        ur44c = UR44C_mock()
+    else:
+        midi_in, midi_out = utils.open_midi_ports(args.midi_in, args.midi_out)
+        ur44c = UR44C(midi_in, midi_out)
 
     app = QApplication(sys.argv)
     enable_dark_mode(app)
