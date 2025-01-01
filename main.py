@@ -209,10 +209,14 @@ class Mute(Button):
     def __init__(self, channel_no, parameter):
         super().__init__("M", channel_no, parameter)
 
+        self.setFixedWidth(20)
+
 
 class Solo(Button):
     def __init__(self, channel_no, parameter):
         super().__init__("S", channel_no, parameter)
+
+        self.setFixedWidth(20)
 
 
 class Input(QWidget):
@@ -225,9 +229,6 @@ class Input(QWidget):
         name_label = QLabel(f"Input {channel_no+1}")
         mbutton = Mute(channel_no, "InputMix1Mute")
         sbutton = Solo(channel_no, "InputMix1Solo")
-
-        mbutton.setFixedWidth(20)
-        sbutton.setFixedWidth(20)
 
         hlayout.addWidget(mbutton)
         hlayout.addWidget(sbutton)
@@ -254,9 +255,6 @@ class DAWInput(QWidget):
         mbutton = Mute(0, "DAWMix1Mute")
         sbutton = Solo(0, "DAWMix1Solo")
 
-        mbutton.setFixedWidth(20)
-        sbutton.setFixedWidth(20)
-
         hlayout.addWidget(mbutton)
         hlayout.addWidget(sbutton)
 
@@ -282,9 +280,6 @@ class MusicInput(QWidget):
         mbutton = Mute(0, "MusicMix1Mute")
         sbutton = Solo(0, "MusicMix1Solo")
 
-        mbutton.setFixedWidth(20)
-        sbutton.setFixedWidth(20)
-
         hlayout.addWidget(mbutton)
         hlayout.addWidget(sbutton)
 
@@ -309,9 +304,6 @@ class VoiceInput(QWidget):
         spacer = QSpacerItem(50, 50, QSizePolicy.Minimum, QSizePolicy.Expanding)
         mbutton = Mute(1, "MusicMix1Mute")
         sbutton = Solo(1, "MusicMix1Solo")
-
-        mbutton.setFixedWidth(20)
-        sbutton.setFixedWidth(20)
 
         hlayout.addWidget(mbutton)
         hlayout.addWidget(sbutton)
