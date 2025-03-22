@@ -66,7 +66,7 @@ def open_midi_ports(midi_in_port = None, midi_out_port = None):
         try:
             index = midi_out.get_ports().index(midi_out_port)
         except ValueError:
-            print(f'Cannot find input midi port {midi_out_port}')
+            print(f'Cannot find output midi port {midi_out_port}')
             sys.exit(1)
     else:
         index = -1
