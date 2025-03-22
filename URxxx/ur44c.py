@@ -9,6 +9,7 @@ class UR44C():
         "F043103E1401040200pppp0000ccvvvvvvvvvvF7 - Reply Parameter
         "F043103E140203........" - Reply Meter Status
     '''
+    num_inputs = 6
 
 
     def __init__(self, midi_in, midi_out):
@@ -152,12 +153,12 @@ class UR44C():
     def SetParameterByName(self, unit, name, value, input=0):
         param_num, min_val, max_val, def_val, val_descr, notes = getattr(unit, name)
         assert min_val <= value <= max_val
-        assert 0 <= input <= 5
+        assert 0 <= input < self.num_inputs
         return self.SetParameter(param_num, value, input)
 
     def GetParameterByName(self, unit, name, input=0):
         param_num, min_val, max_val, def_val, val_descr, notes = getattr(unit, name)
-        assert 0 <= input <= 5
+        assert 0 <= input < self.num_inputs
         return self.GetParameter(param_num, input)
 
 

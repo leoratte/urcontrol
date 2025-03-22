@@ -4,6 +4,7 @@ import time
 class UR44C_mock():
     def __init__(self):
         self.data = {}
+        self.num_inputs = 6
 
 
     def SetParameterByName(self, unit, name, value, input=0):

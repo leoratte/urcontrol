@@ -413,12 +413,8 @@ class Dialog(QDialog):
         super().__init__()
 
         main_layout = QHBoxLayout()
-        main_layout.addWidget(Input(0))
-        main_layout.addWidget(Input(1))
-        main_layout.addWidget(Input(2))
-        main_layout.addWidget(Input(3))
-        main_layout.addWidget(Input(4))
-        main_layout.addWidget(Input(5))
+        for i in range(0, ur44c.num_inputs):
+            main_layout.addWidget(Input(i))
         main_layout.addWidget(DAWInput())
         main_layout.addWidget(MusicInput())
         main_layout.addWidget(VoiceInput())
