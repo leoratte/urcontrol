@@ -13,6 +13,7 @@ from PySide6.QtGui import QPalette, QColor
 
 import utils
 import argparse
+from URxxx.ur22c import *
 from URxxx.ur44c import *
 from URxxx.params import *
 from test.ur44c_mock import *
@@ -469,6 +470,8 @@ if __name__ == '__main__':
         midi_in, midi_out, model = utils.open_midi_ports(args.midi_in, args.midi_out)
         if 'UR44C' in model:
             ur44c = UR44C(midi_in, midi_out)
+        if 'UR22C' in model:
+            ur44c = UR22C(midi_in, midi_out)
 
     app = QApplication()
     enable_dark_mode(app)
