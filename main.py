@@ -466,8 +466,9 @@ if __name__ == '__main__':
     if args.test:
         ur44c = UR44C_mock()
     else:
-        midi_in, midi_out = utils.open_midi_ports(args.midi_in, args.midi_out)
-        ur44c = UR44C(midi_in, midi_out)
+        midi_in, midi_out, model = utils.open_midi_ports(args.midi_in, args.midi_out)
+        if 'UR44C' in model:
+            ur44c = UR44C(midi_in, midi_out)
 
     app = QApplication()
     enable_dark_mode(app)

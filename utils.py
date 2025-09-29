@@ -52,9 +52,11 @@ def open_midi_ports(midi_in_port = None, midi_out_port = None):
             sys.exit(1)
     else:
         index = -1
+        model = ""
         for i, v in enumerate(midi_in.get_ports()):
             if 'Steinberg UR' in v:
                 index = i
+                model = v.split(':')[0]
         if index == -1:
             print(f'Cannot find Steinberg UR device')
             sys.exit(1)
@@ -78,4 +80,4 @@ def open_midi_ports(midi_in_port = None, midi_out_port = None):
             sys.exit(1)
     midi_out.open_port(index)
 
-    return midi_in, midi_out
+    return midi_in, midi_out, model
