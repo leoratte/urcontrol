@@ -3,7 +3,7 @@ from __future__ import annotations
 """PySide6 port of the widgets/layouts/dynamiclayouts example from Qt v5.x"""
 
 from PySide6.QtCore import Qt, QSize, Signal, Slot
-from PySide6.QtWidgets import (QApplication, QDialog, QLayout, QGridLayout,
+from PySide6.QtWidgets import (QApplication, QMainWindow, QLayout, QGridLayout,
                                QMessageBox, QGroupBox, QSpinBox, QSlider, QPushButton,
                                QProgressBar, QDial, QDialogButtonBox, QWidget,
                                QComboBox, QLabel, QVBoxLayout, QHBoxLayout, QSpacerItem,
@@ -410,7 +410,7 @@ class VoiceInput(QWidget):
         self.setLayout(vlayout)
 
 
-class Dialog(QDialog):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
@@ -421,8 +421,9 @@ class Dialog(QDialog):
         main_layout.addWidget(MusicInput())
         main_layout.addWidget(VoiceInput())
 
-        self._main_layout = main_layout
-        self.setLayout(self._main_layout)
+        widget = QWidget()
+        widget.setLayout(main_layout)
+        self.setCentralWidget(widget)
 
         self.setWindowTitle("URcontrol")
 
@@ -477,5 +478,6 @@ if __name__ == '__main__':
     app = QApplication()
     enable_dark_mode(app)
 
-    dialog = Dialog()
-    dialog.exec()
+    main_window = MainWindow()
+    main_window.show()
+    app.exec()
