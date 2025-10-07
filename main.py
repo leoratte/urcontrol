@@ -89,10 +89,11 @@ class Pan(QWidget):
 
         self.label.setText(utils.pan2Label(pos))
 
-    def __init__(self, channel_no):
+    def __init__(self, channel_no, parameter="InputMix1Pan"):
         super().__init__()
 
         self.channel_no = channel_no
+        self.parameter = parameter
 
         val = ur44c.GetParameterByName(self.category, self.parameter, self.channel_no)
         if val == None:
@@ -350,7 +351,7 @@ class DAWInput(QWidget):
         hlayout.addWidget(sbutton)
 
         vlayout.addItem(spacer)
-        vlayout.addWidget(Pan(0))
+        vlayout.addWidget(Pan(0, "DAWMix1Pan"))
         vlayout.addLayout(hlayout)
         vlayout.addWidget(Fader(0, "DAWMix1Volume"))
         vlayout.addWidget(name_label)
