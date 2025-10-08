@@ -284,9 +284,9 @@ class Fx(QWidget):
         fx1_enable_button = FxEnable(channel_no, "InputFX1Enabled")
         fx1_edit_button = FxEdit(channel_no, "InputFX1Enabled")
         fx1_select_dropdown = FxSelect(channel_no, "InputFX1Type")
-        fx2_enable_button = FxEnable(channel_no, "InputFX1Enabled")
+        fx2_enable_button = FxEnable(channel_no, "InputFX2Enabled")
         fx2_edit_button = FxEdit(channel_no, "InputFX1Enabled")
-        fx2_select_dropdown = FxSelect(channel_no, "InputFX1Type")
+        fx2_select_dropdown = FxSelect(channel_no, "InputFX2Type")
 
         spacer = QSpacerItem(15, 15, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
