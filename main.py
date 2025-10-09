@@ -212,13 +212,6 @@ class FxEnable(Button):
         self.setFixedWidth(30)
 
 
-class FxEnable(Button):
-    def __init__(self, channel_no, parameter):
-        super().__init__("⏻", channel_no, parameter)
-
-        self.setFixedWidth(30)
-
-
 class FxEdit(Button):
     def __init__(self, channel_no, parameter):
         super().__init__("🖉", channel_no, parameter)
