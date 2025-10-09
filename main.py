@@ -243,6 +243,8 @@ class FxSelect(QComboBox):
         self.parameter = parameter
 
         self.addItems(["No Effect", "Ch.Strip", "Clean", "Crunch", "Lead", "Drive", "Pitch Fix"])
+        index = ur44c.GetParameterByName(self.category, self.parameter, self.channel_no)
+        self.setCurrentIndex(index)
 
         self.currentIndexChanged.connect(self.select)
 
